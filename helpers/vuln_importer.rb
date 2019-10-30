@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'nokogiri'
 require './model/master'
-require 'msfrpc-client'
+# require 'msfrpc-client'
 
 # For now, we need this to clean up import text a bit
 def clean(text)
@@ -84,29 +84,29 @@ def provide_null_score(finding)
   finding
 end
 
-def get_vulns_from_msf(rpc, workspace)
-  res = rpc.call('console.create')
-
-  vulns = {}
-
-  rpc.call('db.set_workspace', workspace)
-
-  # get vulns TODO:find a better way to handle large amount of vulns
-  res = rpc.call('db.vulns', limit: 9000)
-  res.each do |v|
-    v[1].each do |item|
-      ids = []
-      item['refs'].split(',').each do |i|
-        ids << i
-      end
-      vulns[item['host']] = [] unless vulns[item['host']]
-      ids.each do |id|
-        vulns[item['host']] << id
-      end
-    end
-  end
-  vulns
-end
+# def get_vulns_from_msf(rpc, workspace)
+#   res = rpc.call('console.create')
+#
+#   vulns = {}
+#
+#   rpc.call('db.set_workspace', workspace)
+#
+#   # get vulns TODO:find a better way to handle large amount of vulns
+#   res = rpc.call('db.vulns', limit: 9000)
+#   res.each do |v|
+#     v[1].each do |item|
+#       ids = []
+#       item['refs'].split(',').each do |i|
+#         ids << i
+#       end
+#       vulns[item['host']] = [] unless vulns[item['host']]
+#       ids.each do |id|
+#         vulns[item['host']] << id
+#       end
+#     end
+#   end
+#   vulns
+# end
 
 def parse_nessus_xml(xml, threshold)
   vulns = {}
