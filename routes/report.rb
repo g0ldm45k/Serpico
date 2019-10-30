@@ -1251,6 +1251,24 @@ get '/report/:id/findings/:finding_id/preview' do
   end
 end
 
+# Export report findings as json
+get '/report/:id/json' do
+  id = params[:id]
+
+  @report = get_report(id)
+
+  return 'No Such Report' if @report.nil?
+
+  jsonReport = {}
+  jsonReport["title"] = "#{@report.report_name}"
+
+
+  headers["Content-Disposition"] = "attachment;filename=#{@report.report_name}.json"
+
+  jsonReport.to_json
+
+end
+
 # Generate the report
 get '/report/:id/generate' do
   id = params[:id]

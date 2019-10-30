@@ -63,7 +63,7 @@
   ],
   "threshold": "2",
   "log_file": "./log/serpico.log",
-  "show_exceptions": false,
+  "show_exceptions": true,
   "cvssv2_scoring_override": false,
   "image_align": "center",
   "ssl_ciphers": [
