@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'odle'
+require 'json'
 
 #####
 # Reporting Routes
@@ -1260,8 +1261,33 @@ get '/report/:id/json' do
   return 'No Such Report' if @report.nil?
 
   jsonReport = {}
-  jsonReport["title"] = "#{@report.report_name}"
+  jsonReport["report"] = {}
+  jsonReport["report"]["meta"] = JSON.parse(@report.to_json)
+  jsonReport["report"]["findings"] = []
 
+  @findings, @dread, @cvss, @cvssv3, @risk, @riskmatrix,@nist800 = get_scoring_findings(@report)
+
+  finding_number = 1
+  @findings.each do |finding|
+    finding.finding_number = finding_number
+    # This flags new or edited findings
+    if finding.master_id
+      master = TemplateFindings.first(id: finding.master_id)
+      if master
+        finding.overview = compare_text(finding.overview, master.overview)
+        finding.remediation = compare_text(finding.remediation, master.remediation)
+      else
+        finding.overview = compare_text(finding.overview, nil)
+        finding.remediation = compare_text(finding.remediation, nil)
+      end
+    else
+      finding.overview = compare_text(finding.overview, nil)
+      finding.remediation = compare_text(finding.remediation, nil)
+    end
+    jsonReport["report"]["findings"] << JSON.parse(finding.to_json)
+    finding_number += 1
+  end
+  jsonReport["report"]["meta"]["finding_number"] = finding_number
 
   headers["Content-Disposition"] = "attachment;filename=#{@report.report_name}.json"
 
